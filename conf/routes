@@ -1,0 +1,16 @@
+
+GET           /                                  controllers.HomeController.index()
+
+GET           /user/:id                          controllers.HomeController.getUser(id: Long)
+GET           /deleted/user/:id                  controllers.HomeController.getDeletedUser(id: Long)
+DELETE        /user/:id                          controllers.HomeController.deleteUser(id: Long)
+
+GET           /settings/:id                      controllers.HomeController.getSettings(id: Long)
+GET           /fetch/settings/:id                controllers.HomeController.getSettingsWithFetch(id: Long)
+GET           /deleted/settings/:id              controllers.HomeController.getDeletedSettings(id: Long)
+GET           /deleted/fetch/settings/:id        controllers.HomeController.getDeletedSettingsWithFetch(id: Long)
+DELETE        /settings/:id                      controllers.HomeController.deleteSettings(id: Long)
+
+GET           /account/:id                       controllers.HomeController.getAccount(id: Long)
+GET           /deleted/account/:id               controllers.HomeController.getDeletedAccount(id: Long)
+DELETE        /account/:id                       controllers.HomeController.deleteAccount(id: Long)
