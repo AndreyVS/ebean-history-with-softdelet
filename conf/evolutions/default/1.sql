@@ -1,84 +1,86 @@
-
 # --- !Ups
 
-create table settings (
-  id                            bigint auto_increment not null,
-  userid                        bigint,
-  version                       bigint not null,
-  deleted                       bit(1) default 0 not null,
-  constraint uq_settings_userid unique (userid),
-  constraint pk_settings primary key (id)
+
+CREATE TABLE users (
+  id               BIGINT AUTO_INCREMENT NOT NULL,
+  version          BIGINT                NOT NULL,
+  deleted          BIT(1) DEFAULT 0      NOT NULL,
+  sys_period_start DATETIME DEFAULT now(),
+  sys_period_end   DATETIME,
+  CONSTRAINT pk_users PRIMARY KEY (id)
 );
 
-create table users (
-  id                            bigint auto_increment not null,
-  version                       bigint not null,
-  deleted                       bit(1) default 0 not null,
-  constraint pk_users primary key (id)
+CREATE TABLE settings (
+  id               BIGINT AUTO_INCREMENT NOT NULL,
+  userid           BIGINT,
+  version          BIGINT                NOT NULL,
+  deleted          BIT(1) DEFAULT 0      NOT NULL,
+  sys_period_start DATETIME DEFAULT now(),
+  sys_period_end   DATETIME,
+  CONSTRAINT uq_settings_userId UNIQUE (userid),
+  CONSTRAINT pk_settings PRIMARY KEY (id),
+  CONSTRAINT fk_settings_userId FOREIGN KEY (userid) REFERENCES users (id)
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT
 );
 
-alter table settings add constraint fk_settings_userid foreign key (userid) references users (id) on delete restrict on update restrict;
-
-alter table settings add column sys_period_start datetime(6) default now(6);
-alter table settings add column sys_period_end datetime(6);
-create table settings_history(
-  id                            bigint,
-  userid                        bigint,
-  version                       bigint,
-  deleted                       bit(1),
-  sys_period_start              datetime(6),
-  sys_period_end                datetime(6)
+CREATE TABLE settings_history (
+  id               BIGINT,
+  userid           BIGINT,
+  version          BIGINT,
+  deleted          BIT(1),
+  sys_period_start DATETIME,
+  sys_period_end   DATETIME
 );
-create view settings_with_history as select * from settings union all select * from settings_history;
 
-create trigger settings_history_upd before update on settings for each row begin
-    insert into settings_history (sys_period_start,sys_period_end,id, userId, version, deleted) values (OLD.sys_period_start, now(6),OLD.id, OLD.userId, OLD.version, OLD.deleted);;
-    set NEW.sys_period_start = now(6);;
-end;
+CREATE VIEW settings_with_history AS SELECT *
+                                     FROM settings
+                                     UNION ALL SELECT *
+                                               FROM settings_history;
 
-create trigger settings_history_del before delete on settings for each row begin
-    insert into settings_history (sys_period_start,sys_period_end,id, userId, version, deleted) values (OLD.sys_period_start, now(6),OLD.id, OLD.userId, OLD.version, OLD.deleted);;
-end;
-alter table users add column sys_period_start datetime(6) default now(6);
-alter table users add column sys_period_end datetime(6);
-create table users_history(
-  id                            bigint,
-  version                       bigint,
-  deleted                       bit(1),
-  sys_period_start              datetime(6),
-  sys_period_end                datetime(6)
+CREATE TABLE users_history (
+  id               BIGINT,
+  version          BIGINT,
+  deleted          BIT(1),
+  sys_period_start DATETIME,
+  sys_period_end   DATETIME
 );
-create view users_with_history as select * from users union all select * from users_history;
 
+CREATE VIEW users_with_history AS SELECT *
+                                  FROM users
+                                  UNION ALL SELECT *
+                                            FROM users_history;
 
-create trigger users_history_upd before update on users for each row begin
-    insert into users_history (sys_period_start,sys_period_end,id, version, deleted) values (OLD.sys_period_start, now(6),OLD.id, OLD.version, OLD.deleted);;
-    set NEW.sys_period_start = now(6);;
-end;
+CREATE TABLE accounts (
+  id      BIGINT AUTO_INCREMENT NOT NULL,
+  version BIGINT                NOT NULL,
+  deleted TINYINT(1) DEFAULT 0  NOT NULL,
+  CONSTRAINT pk_accounts PRIMARY KEY (id)
+);
 
-create trigger users_history_del before delete on users for each row begin
-    insert into users_history (sys_period_start,sys_period_end,id, version, deleted) values (OLD.sys_period_start, now(6),OLD.id, OLD.version, OLD.deleted);;
-end;
+INSERT INTO users (id, deleted, version) VALUES (1, 0, 1);
+INSERT INTO users (id, deleted, version) VALUES (2, 0, 1);
+INSERT INTO users (id, deleted, version) VALUES (3, 0, 1);
+INSERT INTO users (id, deleted, version) VALUES (4, 0, 1);
+INSERT INTO users (id, deleted, version) VALUES (5, 0, 1);
+
+INSERT INTO settings (id, userid, deleted, version) VALUES (1, 1, 0, 1);
+INSERT INTO settings (id, userid, deleted, version) VALUES (2, 2, 0, 1);
+INSERT INTO settings (id, userid, deleted, version) VALUES (3, 3, 0, 1);
+INSERT INTO settings (id, userid, deleted, version) VALUES (4, 4, 0, 1);
+INSERT INTO settings (id, userid, deleted, version) VALUES (5, 5, 0, 1);
+
+INSERT INTO accounts (id, deleted, version) VALUES (1, 0, 1);
+INSERT INTO accounts (id, deleted, version) VALUES (2, 0, 1);
+INSERT INTO accounts (id, deleted, version) VALUES (3, 0, 1);
+INSERT INTO accounts (id, deleted, version) VALUES (4, 0, 1);
+INSERT INTO accounts (id, deleted, version) VALUES (5, 0, 1);
 
 # --- !Downs
 
-alter table settings drop foreign key fk_settings_userid;
-
-drop trigger settings_history_upd;
-drop trigger settings_history_del;
-drop view settings_with_history;
-alter table settings drop column sys_period_start;
-alter table settings drop column sys_period_end;
-drop table settings_history;
-
-drop table if exists settings;
-
-drop trigger users_history_upd;
-drop trigger users_history_del;
-drop view users_with_history;
-alter table users drop column sys_period_start;
-alter table users drop column sys_period_end;
-drop table users_history;
-
-drop table if exists users;
-
+DROP VIEW settings_with_history;
+DROP VIEW users_with_history;
+DROP TABLE IF EXISTS settings_history;
+DROP TABLE IF EXISTS settings;
+DROP TABLE IF EXISTS users_history;
+DROP TABLE IF EXISTS users;
