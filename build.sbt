@@ -18,6 +18,7 @@ libraryDependencies += "org.assertj" % "assertj-core" % "3.6.2" % Test
 libraryDependencies += "org.awaitility" % "awaitility" % "2.0.0" % Test
 libraryDependencies += "mysql" % "mysql-connector-java" % "8.0.12"
 libraryDependencies ++= Seq(
+  "io.ebean" % "ebean" % "11.32.1",
   "org.junit.platform" % "junit-platform-runner" % "1.3.1" % Test,
   "org.junit.jupiter" % "junit-jupiter-api" % "5.3.1" % Test,
   "org.junit.jupiter" % "junit-jupiter-engine" % "5.3.1" % Test,
